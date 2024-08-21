@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useState } from "react";
 import "./App.scss";
-
+import { useMFEInputChannel, useMFEOutputChannel } from "./hooks";
 export type AppExternalProps = {
   customerId: string;
   category: string;
@@ -12,16 +12,25 @@ export type AppInternalProps = AppExternalProps & {
 
 export const App = (props: AppInternalProps) => {
   const [count, setCount] = useState(0);
+  const inputChannel = useMFEInputChannel();
+  const outputChannel = useMFEOutputChannel();
   useEffect(() => {
-    console.log("count", count);
-    document.dispatchEvent(
-      new CustomEvent("mfe-event", {
-        detail: {
-          count: count,
-        },
-      })
-    );
-  }, [count]);
+    outputChannel.subscribe((event) => {
+      console.log('received at MFE', event);
+    })
+    return () => {
+      outputChannel.dispose();
+    };
+  }, [outputChannel]);
+  useEffect(() => {
+    inputChannel.emit({
+      type: 'count-changed',
+      payload: { count },
+    });
+    return () => {
+      inputChannel.dispose();
+    };
+  }, [count, inputChannel]);
   return (
     <StrictMode>
       <div className="grid p-5 mt-5 border shadow-lg rounded-xl w-full">

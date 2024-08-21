@@ -1,0 +1,1 @@
+export { DomEventBusChannelClient } from './DomEventBusChannelClient';
