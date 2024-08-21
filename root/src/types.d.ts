@@ -1,5 +1,5 @@
 namespace JSX {
-    interface IntrinsicElements {
-      'raja-test': any;
-    }
+  interface IntrinsicElements {
+    "app-delist": any;
   }
+}

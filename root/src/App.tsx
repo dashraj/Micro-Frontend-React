@@ -1,25 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from "react";
+import "./App.scss";
+import { useScript } from "./util";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isLoaded, error] = useScript("http://localhost:5173/dist/index.js");
 
+  useEffect(() => {
+    console.log(isLoaded);
+    console.log(error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    document.addEventListener("mfe-event", (event: any) => {
+      console.log(event);
+      // alert(`Counter value is ${event?.detail?.count}`);
+    });
+  }, [isLoaded, error]);
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <raja-test customer-id="Raja" category="Developer"></raja-test>
-
+      <app-delist customer-id="Bab" category="Manager"></app-delist>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

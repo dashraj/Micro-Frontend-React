@@ -57,4 +57,4 @@ const WebComponent = r2wc(AppPlusShadowStyles, {
   shadow: "open",
   props: APP_EXTERNAL_PROPS,
 });
-customElements.define("app-delist", WebComponent);
+customElements.define("app-test", WebComponent);
