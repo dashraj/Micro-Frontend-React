@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useState } from "react";
 import "./App.scss";
-import { useMFEInputChannel, useMFEOutputChannel } from "./hooks";
+import { useEventBusChannel } from "./hooks";
 export type AppExternalProps = {
   customerId: string;
   category: string;
@@ -12,25 +12,34 @@ export type AppInternalProps = AppExternalProps & {
 
 export const App = (props: AppInternalProps) => {
   const [count, setCount] = useState(0);
-  const inputChannel = useMFEInputChannel();
-  const outputChannel = useMFEOutputChannel();
+  const channel = useEventBusChannel();
+
   useEffect(() => {
-    outputChannel.subscribe((event) => {
-      console.log('received at MFE', event);
-    })
+    document.addEventListener("mfe:local-event", (event) => {
+      console.log(event);
+    });
+
     return () => {
-      outputChannel.dispose();
+      document.removeEventListener("mfe:local-event", (event) => {
+        console.log(event);
+      });
     };
-  }, [outputChannel]);
+  }, []);
+
   useEffect(() => {
-    inputChannel.emit({
-      type: 'count-changed',
+    channel.subscribe((event) => {
+      if (event.type.toString().includes("host"))
+        console.log("received at MFE", event);
+    });
+    channel.emit({
+      type: "mfe:count-changed",
       payload: { count },
     });
     return () => {
-      inputChannel.dispose();
+      channel.dispose();
     };
-  }, [count, inputChannel]);
+  }, [count, channel]);
+
   return (
     <StrictMode>
       <div className="grid p-5 mt-5 border shadow-lg rounded-xl w-full">
@@ -44,6 +53,13 @@ export const App = (props: AppInternalProps) => {
             <div className="card">
               <button onClick={() => setCount((count) => count + 1)}>
                 count is {count}
+              </button>
+              <button
+                onClick={() =>
+                  document.dispatchEvent(new CustomEvent("mfe:local-event"))
+                }
+              >
+                send local event
               </button>
             </div>
           </div>

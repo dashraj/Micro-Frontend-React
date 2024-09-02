@@ -1,2 +1,1 @@
-export * from './useMFEInputChannel';
-export * from './useMFEOutputChannel';
+export * from "./useEventBusChannel";

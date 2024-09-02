@@ -1,2 +1,1 @@
-export * from './useHostInputChannel';
-export * from './useHostOutputChannel';
+export * from "./useEventBusChannel";

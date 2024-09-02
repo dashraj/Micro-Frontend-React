@@ -1,22 +1,23 @@
-import { FC, memo, useEffect } from 'react';
-import { useHostInputChannel, useHostOutputChannel } from './hooks';
+import { FC, memo, useEffect } from "react";
+import { useEventBusChannel } from "./hooks";
 
 export const HostEventBusLogger: FC = memo(function HostEventBusLogger() {
-    const outputChannel = useHostOutputChannel();
-    const inputChannel = useHostInputChannel();
+  const channel = useEventBusChannel();
 
-    useEffect(() => {
-        const outputSubscription = outputChannel.subscribe((event) => {
-            console.log('event.received at host', event);
-        });
-        const inputSubscription = inputChannel.subscribe((event) => {
-            console.log('event.sent from host', event);
-        });
-        return () => {
-            outputSubscription.dispose();
-            inputSubscription.dispose();
-        };
-    }, [inputChannel, outputChannel]);
+  useEffect(() => {
+    const subscription = channel.subscribe((event) => {
+      if (event.type.toString().includes("mfe")) {
+        console.log("event.received at host:", event);
+      } else if (event.type.toString().includes("host")) {
+        console.log("event.sent from host:", event);
+      } else {
+        console.log("unknown event:", event);
+      }
+    });
+    return () => {
+      subscription.dispose();
+    };
+  }, [channel]);
 
-    return null;
+  return null;
 });

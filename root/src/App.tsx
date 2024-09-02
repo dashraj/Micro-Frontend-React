@@ -2,28 +2,25 @@ import { useEffect } from "react";
 import "./App.scss";
 import { useScript } from "./util";
 import { EventBusAdaptor } from "./EventBusAdaptor";
-import { EVENT_BUS_HOST_OUTPUT_CHANNEL_NAME } from "../../event-bus/common.constants";
-import { useHostInputChannel, useHostOutputChannel } from "./hooks";
+import { useEventBusChannel } from "./hooks";
 
 function App() {
-  const [isLoaded, error] = useScript("http://localhost:5173/dist/index.js");
+  useScript("http://localhost:5173/dist/index.js");
 
-  const inputChannel = useHostInputChannel();
-  const outputChannel = useHostOutputChannel();
-
+  const channel = useEventBusChannel();
 
   useEffect(() => {
-    outputChannel.subscribe((event) => {
-      inputChannel.emit({
-        type: 'count-received'
-      });
-    })
+    channel.subscribe((event) => {
+      if (event.type == "mfe:count-changed")
+        channel.emit({
+          type: "host:count-received",
+        });
+    });
 
     return () => {
-      inputChannel.dispose();
-      outputChannel.dispose();
+      channel.dispose();
     };
-  }, [inputChannel, outputChannel]);
+  }, [channel]);
 
   return (
     <>
